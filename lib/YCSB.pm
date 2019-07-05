@@ -57,6 +57,14 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 #========================================================================
 use Moose;
+use YCSB::Metrics;
+
+sub parse_output {
+    my ($self, $output) = @_;
+
+    my $metrics = YCSB::Metrics->new()->load_pla
+
+}
 
 1;
 

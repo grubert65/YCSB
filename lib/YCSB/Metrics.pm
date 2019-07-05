@@ -142,6 +142,9 @@ EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #===============================================================================
 use Moose;
+use JSON::XS;
+use Try::Tiny;
+use Log::Log4perl;
 
 has 'OVERALL_RunTime_ms'                            => ( is => 'rw', isa => 'Int');
 has 'OVERALL_Throughput_ops_sec'                    => ( is => 'rw', isa => 'Num' );
@@ -168,6 +171,13 @@ has 'INSERT_95thPercentileLatency_us'               => ( is => 'rw', isa => 'Int
 has 'INSERT_99thPercentileLatency_us'               => ( is => 'rw', isa => 'Int' );
 has 'INSERT_Return_OK'                              => ( is => 'rw', isa => 'Int' );
 
+has 'log' => (
+    is => 'ro',
+    isa => 'Log::Log4perl::Logger',
+    lazy    => 1,
+    default => sub { return Log::Log4perl->get_logger(__PACKAGE__) },
+);
+
 #=============================================================
 
 =head2 load_plain_text
@@ -191,23 +201,61 @@ sub load_plain_text {
 
     my @lines = split(/\n/, $text);
     foreach ( @lines ) {
-        my ($type, $metric, $value) = split(/,/);
+        my ($metric, $measurement, $value) = split(/,/);
 
-        $type =~ s/\[//g;
-        $type =~ s/\]//g;
-        $type =~ s/%/percent/g;
-        $metric =~ s/%/percent/g;
-        $metric =~ s/\(/_/g;
-        $metric =~ s/\)//g;
-        $metric =~ s|/|_|g;
-        $metric =~ s/=/_/g;
-        $metric =~ s/ //g;
+        $metric      = format_metric( $metric );
+        $measurement = format_measurement( $measurement );
         $value =~ s/ //g;
 
-        my $key = $type.'_'.$metric;
+        my $key = $metric.'_'.$measurement;
         $self->{ $key } = $value;
     }
     return 1;
+}
+
+sub load_json {
+    my ( $self, $json ) = @_;
+
+    try {
+        my $h = decode_json ($json);
+
+        foreach ( @$h ) {
+            my $metric = format_metric( $_->{metric} );
+            my $measurement = format_measurement( $_->{measurement} );
+            my $value = $_->{value};
+            $value =~ s/ //g;
+
+            my $key = $metric.'_'.$measurement;
+            $self->{ $key } = $value;
+        }
+    } catch {
+        $self->log->error("Couldn't decode json text");
+        return 0;
+    };
+    return 1;
+}
+
+sub format_metric {
+    my $metric = shift;
+
+    $metric =~ s/\[//g;
+    $metric =~ s/\]//g;
+    $metric =~ s/%/percent/g;
+
+    return $metric;
+}
+
+sub format_measurement {
+    my $measurement = shift;
+
+    $measurement =~ s/%/percent/g;
+    $measurement =~ s/\(/_/g;
+    $measurement =~ s/\)//g;
+    $measurement =~ s|/|_|g;
+    $measurement =~ s/=/_/g;
+    $measurement =~ s/ //g;
+
+    return $measurement;
 }
 
 1; 
