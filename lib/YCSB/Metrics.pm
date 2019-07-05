@@ -199,18 +199,23 @@ Loads an output text that should conform to the following pattern:
 sub load_plain_text {
     my ( $self, $text ) = @_;
 
-    my @lines = split(/\n/, $text);
-    foreach ( @lines ) {
-        my ($metric, $measurement, $value) = split(/,/);
-
-        $metric      = format_metric( $metric );
-        $measurement = format_measurement( $measurement );
-        $value =~ s/ //g;
-
-        my $key = $metric.'_'.$measurement;
-        $self->{ $key } = $value;
-    }
-    return 1;
+    try {
+        my @lines = split(/\n/, $text);
+        foreach ( @lines ) {
+            my ($metric, $measurement, $value) = split(/,/);
+    
+            $metric      = format_metric( $metric );
+            $measurement = format_measurement( $measurement );
+            $value =~ s/ //g;
+    
+            my $key = $metric.'_'.$measurement;
+            $self->{ $key } = $value;
+        }
+        return 1;
+    } catch {
+        $self->log->error("Couldn't decode text: $_");
+        return 0;
+    };
 }
 
 sub load_json {
@@ -228,15 +233,22 @@ sub load_json {
             my $key = $metric.'_'.$measurement;
             $self->{ $key } = $value;
         }
+        return 1;
     } catch {
-        $self->log->error("Couldn't decode json text");
+        $self->log->error("Couldn't decode json text: $_");
         return 0;
     };
-    return 1;
+}
+
+sub load_metrics {
+    my ( $self, $text ) = @_;
+
+    $self->load_json( $text ) || $self->load_plain_text( $text );
 }
 
 sub format_metric {
     my $metric = shift;
+    die "No metric found!" unless $metric;
 
     $metric =~ s/\[//g;
     $metric =~ s/\]//g;
@@ -247,6 +259,7 @@ sub format_metric {
 
 sub format_measurement {
     my $measurement = shift;
+    die "No measurement found!" unless $measurement;
 
     $measurement =~ s/%/percent/g;
     $measurement =~ s/\(/_/g;
