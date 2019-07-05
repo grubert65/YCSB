@@ -28,61 +28,9 @@ our $VERSION = '0.01';
     $m->load_json( $json );
 
     After metrics are loaded from a workload output, they 
-    are available via the following attributes:
-
-=over 4
-
-=item overall_runtime_ms
-
-=item overall_throughput_ops_sec 
-
-=item total_gcs_g1_young_generation
-
-=item total_gc_time_g1_young_generation
-
-=item total_gc_time_percent_g1_young_generation 
-
-=item total_gcs_g1_old_generation
-
-=item total_gc_time_g1_old_generation_ms
-
-=item total_gc_time_percent_g1_old_generation
-
-=item total_gcs
-
-=item total_gc_time_ms
-
-=item total_gc_time_percent
-
-=item cleanup_operations
-
-=item cleanup_average_latency_us
-
-=item cleanup_min_latency_us
-
-=item cleanup_max_latency_us
-
-=item cleanup_95th_percentile_latency_us
-
-=item cleanup_99th_percentile_latency_us
-
-=item insert_operations
-
-=item insert_average_latency_us
-
-=item insert_min_latency_us
-
-=item insert_max_latency_us
-
-=item insert_95th_percentile_latency_us
-
-=item insert_99th_percentile_latency_us
-
-=item insert_return_ok
-
-
-
-=head1 EXPORT
+    are available as attributes. Naming conventions:
+    - an '_' char is added between metric and measurement
+    - the '%' char is replaced with the 'percent' string
 
 
 =head1 AUTHOR
@@ -146,30 +94,30 @@ use JSON::XS;
 use Try::Tiny;
 use Log::Log4perl;
 
-has 'OVERALL_RunTime_ms'                            => ( is => 'rw', isa => 'Int');
-has 'OVERALL_Throughput_ops_sec'                    => ( is => 'rw', isa => 'Num' );
-has 'TOTAL_GCS_G1_Young_Generation_Count'           => ( is => 'rw', isa => 'Int');
-has 'TOTAL_GC_TIME_G1_Young_Generation_Time_ms'     => ( is => 'rw', isa => 'Int');
-has 'TOTAL_GC_TIME_percent_G1_Young_Generation_Time_percent'  => ( is => 'rw', isa => 'Num' );
-has 'TOTAL_GCS_G1_Old_Generation'                   => ( is => 'rw', isa => 'Int');
-has 'TOTAL_GC_TIME_G1_Old_Generation_Time_ms'       => ( is => 'rw', isa => 'Int');
-has 'TOTAL_GC_TIME_percent_G1_Old_Generation_Time_percent'    => ( is => 'rw', isa => 'Num' );
-has 'TOTAL_GCs_Count'                               => ( is => 'rw', isa => 'Int');
-has 'TOTAL_GC_TIME_Time_ms'                         => ( is => 'rw', isa => 'Int');
-has 'TOTAL_GC_TIME_percent_Time_percent'            => ( is => 'rw', isa => 'Num' );
-has 'CLEANUP_Operations'                            => ( is => 'rw', isa => 'Int');
-has 'CLEANUP_AverageLatency_us'                     => ( is => 'rw', isa => 'Num' );
-has 'CLEANUP_MinLatency_us'                         => ( is => 'rw', isa => 'Int' );
-has 'CLEANUP_MaxLatency_us'                         => ( is => 'rw', isa => 'Int' );
-has 'CLEANUP_95thPercentileLatency_us'              => ( is => 'rw', isa => 'Int' );
-has 'CLEANUP_99thPercentileLatency_us'              => ( is => 'rw', isa => 'Int' );
-has 'INSERT_Operations'                             => ( is => 'rw', isa => 'Int' );
-has 'INSERT_AverageLatency_us'                      => ( is => 'rw', isa => 'Num' );
-has 'INSERT_MinLatency_us'                          => ( is => 'rw', isa => 'Int' );
-has 'INSERT_MaxLatency_us'                          => ( is => 'rw', isa => 'Int' );
-has 'INSERT_95thPercentileLatency_us'               => ( is => 'rw', isa => 'Int' );
-has 'INSERT_99thPercentileLatency_us'               => ( is => 'rw', isa => 'Int' );
-has 'INSERT_Return_OK'                              => ( is => 'rw', isa => 'Int' );
+# has 'OVERALL_RunTime_ms'                            => ( is => 'rw', isa => 'Int');
+# has 'OVERALL_Throughput_ops_sec'                    => ( is => 'rw', isa => 'Num' );
+# has 'TOTAL_GCS_G1_Young_Generation_Count'           => ( is => 'rw', isa => 'Int');
+# has 'TOTAL_GC_TIME_G1_Young_Generation_Time_ms'     => ( is => 'rw', isa => 'Int');
+# has 'TOTAL_GC_TIME_percent_G1_Young_Generation_Time_percent'  => ( is => 'rw', isa => 'Num' );
+# has 'TOTAL_GCS_G1_Old_Generation'                   => ( is => 'rw', isa => 'Int');
+# has 'TOTAL_GC_TIME_G1_Old_Generation_Time_ms'       => ( is => 'rw', isa => 'Int');
+# has 'TOTAL_GC_TIME_percent_G1_Old_Generation_Time_percent'    => ( is => 'rw', isa => 'Num' );
+# has 'TOTAL_GCs_Count'                               => ( is => 'rw', isa => 'Int');
+# has 'TOTAL_GC_TIME_Time_ms'                         => ( is => 'rw', isa => 'Int');
+# has 'TOTAL_GC_TIME_percent_Time_percent'            => ( is => 'rw', isa => 'Num' );
+# has 'CLEANUP_Operations'                            => ( is => 'rw', isa => 'Int');
+# has 'CLEANUP_AverageLatency_us'                     => ( is => 'rw', isa => 'Num' );
+# has 'CLEANUP_MinLatency_us'                         => ( is => 'rw', isa => 'Int' );
+# has 'CLEANUP_MaxLatency_us'                         => ( is => 'rw', isa => 'Int' );
+# has 'CLEANUP_95thPercentileLatency_us'              => ( is => 'rw', isa => 'Int' );
+# has 'CLEANUP_99thPercentileLatency_us'              => ( is => 'rw', isa => 'Int' );
+# has 'INSERT_Operations'                             => ( is => 'rw', isa => 'Int' );
+# has 'INSERT_AverageLatency_us'                      => ( is => 'rw', isa => 'Num' );
+# has 'INSERT_MinLatency_us'                          => ( is => 'rw', isa => 'Int' );
+# has 'INSERT_MaxLatency_us'                          => ( is => 'rw', isa => 'Int' );
+# has 'INSERT_95thPercentileLatency_us'               => ( is => 'rw', isa => 'Int' );
+# has 'INSERT_99thPercentileLatency_us'               => ( is => 'rw', isa => 'Int' );
+# has 'INSERT_Return_OK'                              => ( is => 'rw', isa => 'Int' );
 
 has 'log' => (
     is => 'ro',
@@ -218,6 +166,21 @@ sub load_plain_text {
     };
 }
 
+#=============================================================
+
+=head2 load_json
+
+=head3 INPUT
+
+=head3 OUTPUT
+
+=head3 DESCRIPTION
+
+Tries to load the metrics assuming text comes encoded in JSON
+
+=cut
+
+#=============================================================
 sub load_json {
     my ( $self, $json ) = @_;
 
@@ -240,6 +203,21 @@ sub load_json {
     };
 }
 
+#=============================================================
+
+=head2 load_metrics
+
+=head3 INPUT
+
+=head3 OUTPUT
+
+=head3 DESCRIPTION
+
+Tries to load metrics no matter the formatting
+
+=cut
+
+#=============================================================
 sub load_metrics {
     my ( $self, $text ) = @_;
 
