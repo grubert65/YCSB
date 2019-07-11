@@ -34,7 +34,7 @@ my $text = <<EOT;
 EOT
 
 ok( $m->load_plain_text( $text ), 'load_plain_text' );
-is( $m->{INSERT_99thPercentileLatency_us}, 402, 'got right data back' );
+is( $m->{metrics}->{INSERT_99thPercentileLatency_us}, 402, 'got right data back' );
 
 
 done_testing();

@@ -118,6 +118,8 @@ use Log::Log4perl;
 # has 'INSERT_95thPercentileLatency_us'               => ( is => 'rw', isa => 'Int' );
 # has 'INSERT_99thPercentileLatency_us'               => ( is => 'rw', isa => 'Int' );
 # has 'INSERT_Return_OK'                              => ( is => 'rw', isa => 'Int' );
+#
+has 'metrics' => ( is => 'rw', isa => 'HashRef' );
 
 has 'log' => (
     is => 'ro',
@@ -157,7 +159,7 @@ sub load_plain_text {
             $value =~ s/ //g;
     
             my $key = $metric.'_'.$measurement;
-            $self->{ $key } = $value;
+            $self->{metrics}->{ $key } = $value;
         }
         return 1;
     } catch {
@@ -194,7 +196,7 @@ sub load_json {
             $value =~ s/ //g;
 
             my $key = $metric.'_'.$measurement;
-            $self->{ $key } = $value;
+            $self->{metrics}->{ $key } = $value;
         }
         return 1;
     } catch {

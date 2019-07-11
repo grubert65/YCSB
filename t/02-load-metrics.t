@@ -113,7 +113,7 @@ EOT
 
 # try first with proper json text...
 ok( $m->load_metrics( $text ), 'load_metrics' );
-is( $m->{INSERT_99thPercentileLatency_us}, 27935, 'got right data back' );
+is( $m->{metrics}->{INSERT_99thPercentileLatency_us}, 27935, 'got right data back' );
 
 # try then with proper text formatted text...
 $text = <<EOT;
@@ -144,7 +144,7 @@ $text = <<EOT;
 EOT
 
 ok( $m->load_metrics( $text ), 'load_metrics' );
-is( $m->{INSERT_99thPercentileLatency_us}, 402, 'got right data back' );
+is( $m->{metrics}->{INSERT_99thPercentileLatency_us}, 402, 'got right data back' );
 
 #...and now try with that shit that actually comes out using the "JSON" YCSB formatter...
 $text = <<EOT;

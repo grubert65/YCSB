@@ -109,7 +109,7 @@ my $text = <<EOT;
 EOT
 
 ok( $m->load_json( $text ), 'load_json' );
-is( $m->{INSERT_99thPercentileLatency_us}, 27935, 'got right data back' );
+is( $m->{metrics}->{INSERT_99thPercentileLatency_us}, 27935, 'got right data back' );
 
 
 done_testing();
